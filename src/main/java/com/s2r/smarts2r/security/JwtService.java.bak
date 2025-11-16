@@ -1,0 +1,58 @@
+/* Backup of duplicate JwtService placed in security package.
+   The project uses `com.s2r.smarts2r.service.JwtService` (preferred). */
+package com.s2r.smarts2r.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.Map;
+
+@Service
+public class JwtService {
+
+    private final Key key;
+    private final long expiration;
+
+    public JwtService(
+            @Value("${s2r.jwt.secret}") String secret,
+            @Value("${s2r.jwt.expiration}") long expiration
+    ) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expiration = expiration;
+    }
+
+    public String generateToken(String subject, Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key)
+                .compact();
+    }
+
+    public String extractSubject(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public boolean isValid(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}

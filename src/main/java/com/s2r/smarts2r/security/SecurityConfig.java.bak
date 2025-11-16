@@ -1,0 +1,26 @@
+/*
+ Backup of src/main/java/com/s2r/smarts2r/security/SecurityConfig.java
+ This file was moved to a backup to avoid ConflictingBeanDefinitionException.
+ If you need to restore it, review the file and move it back or copy contents.
+*/
+package com.s2r.smarts2r.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+// @Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(cs -> cs.disable());
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .anyRequest().authenticated()
+        );
+        http.httpBasic(Customizer.withDefaults());
+        return http.build();
+    }
+}
