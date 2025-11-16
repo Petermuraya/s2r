@@ -1,0 +1,467 @@
+{
+  "api": {
+    "version": "1.0.0",
+    "baseUrl": "http://localhost:8080",
+    "apiPrefix": "/api/v1",
+    "description": "Smart-S2R Backend API - Suppliers to Retailers Platform",
+    "endpoints": {
+      "authentication": [
+        {
+          "name": "Register User",
+          "method": "POST",
+          "path": "/auth/register",
+          "auth": false,
+          "description": "Register a new user (RETAILER, SUPPLIER, or ADMIN)",
+          "request": {
+            "fullName": "string",
+            "phone": "string (unique)",
+            "email": "string",
+            "password": "string",
+            "role": "RETAILER | SUPPLIER | ADMIN"
+          },
+          "response": {
+            "userId": "number",
+            "fullName": "string",
+            "phone": "string",
+            "role": "string",
+            "token": "string (JWT access token)",
+            "refreshToken": "string (JWT refresh token)"
+          }
+        },
+        {
+          "name": "Login User",
+          "method": "POST",
+          "path": "/auth/login",
+          "auth": false,
+          "description": "Authenticate user with phone and password",
+          "request": {
+            "phone": "string",
+            "password": "string"
+          },
+          "response": {
+            "userId": "number",
+            "fullName": "string",
+            "phone": "string",
+            "role": "string",
+            "token": "string",
+            "refreshToken": "string"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "method": "POST",
+          "path": "/auth/refresh",
+          "auth": false,
+          "description": "Get new access token using refresh token",
+          "request": {
+            "refreshToken": "string"
+          },
+          "response": {
+            "token": "string"
+          }
+        }
+      ],
+      "retailerProfiles": [
+        {
+          "name": "Create Retailer Profile",
+          "method": "POST",
+          "path": "/retailers",
+          "auth": true,
+          "description": "Create a retailer profile for authenticated user",
+          "request": {
+            "shopName": "string (required)",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          },
+          "response": {
+            "id": "number",
+            "userId": "number",
+            "shopName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          }
+        },
+        {
+          "name": "Get Profile by ID",
+          "method": "GET",
+          "path": "/retailers/{id}",
+          "auth": false,
+          "description": "Retrieve retailer profile by profile ID",
+          "params": {
+            "id": "number (profile ID)"
+          },
+          "response": {
+            "id": "number",
+            "userId": "number",
+            "shopName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          }
+        },
+        {
+          "name": "Get Profile by User ID",
+          "method": "GET",
+          "path": "/retailers/user/{userId}",
+          "auth": false,
+          "description": "Retrieve retailer profile by user ID",
+          "params": {
+            "userId": "number"
+          },
+          "response": {
+            "id": "number",
+            "userId": "number",
+            "shopName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "method": "PUT",
+          "path": "/retailers/{id}",
+          "auth": true,
+          "description": "Update retailer profile",
+          "params": {
+            "id": "number"
+          },
+          "request": {
+            "shopName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          },
+          "response": {
+            "id": "number",
+            "userId": "number",
+            "shopName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          }
+        },
+        {
+          "name": "Delete Profile",
+          "method": "DELETE",
+          "path": "/retailers/{id}",
+          "auth": true,
+          "description": "Delete retailer profile",
+          "params": {
+            "id": "number"
+          },
+          "response": {
+            "status": 204,
+            "content": "No content"
+          }
+        },
+        {
+          "name": "Find Nearby Suppliers (from Coordinates)",
+          "method": "POST",
+          "path": "/retailers/nearby-suppliers",
+          "auth": false,
+          "description": "Find suppliers near specified coordinates (sorted by distance)",
+          "request": {
+            "latitude": "number (required)",
+            "longitude": "number (required)",
+            "radiusKm": "number (default: 5.0)"
+          },
+          "response": [
+            {
+              "supplierId": "number",
+              "userId": "number",
+              "businessName": "string",
+              "address": "string",
+              "phone": "string",
+              "email": "string",
+              "latitude": "number",
+              "longitude": "number",
+              "description": "string",
+              "distanceKm": "number"
+            }
+          ]
+        },
+        {
+          "name": "Find Nearby Suppliers (from Profile)",
+          "method": "GET",
+          "path": "/retailers/{retailerId}/nearby-suppliers",
+          "auth": false,
+          "description": "Find suppliers near retailer's stored location",
+          "params": {
+            "retailerId": "number",
+            "radiusKm": "number (optional, default: 5.0)"
+          },
+          "response": [
+            {
+              "supplierId": "number",
+              "userId": "number",
+              "businessName": "string",
+              "address": "string",
+              "phone": "string",
+              "email": "string",
+              "latitude": "number",
+              "longitude": "number",
+              "description": "string",
+              "distanceKm": "number"
+            }
+          ]
+        },
+        {
+          "name": "Find Nearby Suppliers (for Me)",
+          "method": "GET",
+          "path": "/retailers/me/nearby-suppliers",
+          "auth": true,
+          "description": "Find suppliers near authenticated retailer's location",
+          "params": {
+            "radiusKm": "number (optional, default: 5.0)"
+          },
+          "response": [
+            {
+              "supplierId": "number",
+              "userId": "number",
+              "businessName": "string",
+              "address": "string",
+              "phone": "string",
+              "email": "string",
+              "latitude": "number",
+              "longitude": "number",
+              "description": "string",
+              "distanceKm": "number"
+            }
+          ]
+        }
+      ],
+      "supplierProfiles": [
+        {
+          "name": "Create Supplier Profile",
+          "method": "POST",
+          "path": "/suppliers",
+          "auth": false,
+          "description": "Create a supplier profile",
+          "request": {
+            "userId": "number (required)",
+            "businessName": "string (required)",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          },
+          "response": {
+            "id": "number",
+            "userId": "number",
+            "businessName": "string",
+            "address": "string",
+            "latitude": "number",
+            "longitude": "number",
+            "description": "string"
+          }
+        },
+        {
+          "name": "Get Nearby Suppliers",
+          "method": "GET",
+          "path": "/suppliers/nearby",
+          "auth": false,
+          "description": "Find suppliers near coordinates (legacy endpoint)",
+          "params": {
+            "lat": "number (required)",
+            "lon": "number (required)",
+            "radiusKm": "number (optional, default: 10)"
+          },
+          "response": [
+            {
+              "id": "number",
+              "userId": "number",
+              "businessName": "string",
+              "address": "string",
+              "latitude": "number",
+              "longitude": "number",
+              "description": "string"
+            }
+          ]
+        }
+      ],
+      "orders": [
+        {
+          "name": "Create Order",
+          "method": "POST",
+          "path": "/orders",
+          "auth": true,
+          "description": "Create a new order (Retailer places order with Supplier)",
+          "request": {
+            "supplierId": "number (required)",
+            "totalAmount": "number (decimal)",
+            "notes": "string"
+          },
+          "response": {
+            "id": "number",
+            "retailerId": "number",
+            "supplierId": "number",
+            "status": "PENDING | IN_PROGRESS | DELIVERED | CANCELLED",
+            "totalAmount": "number",
+            "notes": "string",
+            "createdAt": "ISO 8601 timestamp",
+            "updatedAt": "ISO 8601 timestamp",
+            "deliveredAt": "ISO 8601 timestamp"
+          }
+        },
+        {
+          "name": "Get Retailer Orders",
+          "method": "GET",
+          "path": "/orders/retailer/{id}",
+          "auth": false,
+          "description": "Get all orders from a retailer",
+          "params": {
+            "id": "number (retailer ID)"
+          },
+          "response": [
+            {
+              "id": "number",
+              "retailerId": "number",
+              "supplierId": "number",
+              "status": "string",
+              "totalAmount": "number",
+              "notes": "string",
+              "createdAt": "string",
+              "updatedAt": "string",
+              "deliveredAt": "string"
+            }
+          ]
+        },
+        {
+          "name": "Get Supplier Orders",
+          "method": "GET",
+          "path": "/orders/supplier/{id}",
+          "auth": false,
+          "description": "Get all orders received by a supplier",
+          "params": {
+            "id": "number (supplier ID)"
+          },
+          "response": [
+            {
+              "id": "number",
+              "retailerId": "number",
+              "supplierId": "number",
+              "status": "string",
+              "totalAmount": "number",
+              "notes": "string",
+              "createdAt": "string",
+              "updatedAt": "string",
+              "deliveredAt": "string"
+            }
+          ]
+        },
+        {
+          "name": "Get Order Details",
+          "method": "GET",
+          "path": "/orders/{id}",
+          "auth": false,
+          "description": "Get specific order details",
+          "params": {
+            "id": "number"
+          },
+          "response": {
+            "id": "number",
+            "retailerId": "number",
+            "supplierId": "number",
+            "status": "string",
+            "totalAmount": "number",
+            "notes": "string",
+            "createdAt": "string",
+            "updatedAt": "string",
+            "deliveredAt": "string"
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "method": "PATCH",
+          "path": "/orders/{id}/status",
+          "auth": true,
+          "description": "Update order status (Supplier updates delivery status)",
+          "params": {
+            "id": "number"
+          },
+          "request": {
+            "status": "PENDING | IN_PROGRESS | DELIVERED | CANCELLED"
+          },
+          "response": {
+            "id": "number",
+            "retailerId": "number",
+            "supplierId": "number",
+            "status": "string",
+            "totalAmount": "number",
+            "notes": "string",
+            "createdAt": "string",
+            "updatedAt": "string",
+            "deliveredAt": "string"
+          }
+        }
+      ],
+      "ratings": [
+        {
+          "name": "Submit Rating",
+          "method": "POST",
+          "path": "/ratings",
+          "auth": true,
+          "description": "Submit rating for a supplier (Retailer rates Supplier)",
+          "request": {
+            "supplierId": "number (required)",
+            "score": "number 1-5 (required)",
+            "comment": "string"
+          },
+          "response": {
+            "id": "number",
+            "retailerId": "number",
+            "supplierId": "number",
+            "score": "number",
+            "comment": "string",
+            "createdAt": "string"
+          }
+        },
+        {
+          "name": "Get Supplier Rating Stats",
+          "method": "GET",
+          "path": "/ratings/supplier/{id}/stats",
+          "auth": false,
+          "description": "Get average rating and count for a supplier",
+          "params": {
+            "id": "number (supplier ID)"
+          },
+          "response": {
+            "average": "number",
+            "count": "number"
+          }
+        }
+      ]
+    },
+    "authentication": {
+      "type": "JWT (Bearer Token)",
+      "header": "Authorization: Bearer {token}",
+      "tokenExpiration": "1 day (86400000 ms)",
+      "refreshTokenExpiration": "30 days (2592000000 ms)"
+    },
+    "httpStatusCodes": {
+      "200": "OK - Request successful",
+      "201": "Created - Resource created successfully",
+      "204": "No Content - Request successful, no content",
+      "400": "Bad Request - Invalid parameters",
+      "401": "Unauthorized - Missing/invalid authentication",
+      "404": "Not Found - Resource not found",
+      "500": "Internal Server Error"
+    },
+    "dataTypes": {
+      "role": ["RETAILER", "SUPPLIER", "ADMIN"],
+      "orderStatus": ["PENDING", "IN_PROGRESS", "DELIVERED", "CANCELLED"],
+      "ratingScore": "1-5 (integer)",
+      "coordinates": "Decimal degrees (e.g., -1.2833, 36.8167)",
+      "radius": "Kilometers (e.g., 5.0, 10.0)"
+    }
+  }
+}
